@@ -2,38 +2,32 @@ name: ESP32 Build and Flash
 
 on:
   push:
-  pull_request:
 
 jobs:
   build_and_flash:
     runs-on: self-hosted
 
-    container:
-      image: espressif/idf:latest
-      options: --device=/dev/ttyUSB0
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Check USB device
+      - name: Load ESP-IDF
         run: |
-          ls /dev/tty*
+          source ~/esp/esp-idf/export.sh
+          idf.py --version
 
-      - name: Build firmware
+      - name: Build
         run: |
+          source ~/esp/esp-idf/export.sh
           idf.py set-target esp32c3
           idf.py build
 
-      - name: Flash firmware to ESP32
+      - name: Flash
         run: |
+          source ~/esp/esp-idf/export.sh
           idf.py -p /dev/ttyUSB0 flash
 
-      - name: Upload firmware artifact
+      - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: esp32_firmware
-          path: |
-            build/*.bin
-            build/bootloader/*.bin
-            build/partition_table/*.bin
+          name: firmware
+          path: build/*.bin
