@@ -40,23 +40,23 @@ jobs:
           idf.py -p $PORT flash
 
       - name: Capture UART log
-              run: |
-                source ~/esp-idf/export.sh
-                
-                # 1. Kích hoạt chip chạy (Reset)
-                esptool.py --chip esp32c3 -p /dev/ttyACM0 run
-                sleep 1 # Đợi 1 giây để cổng serial ổn định
-                
-                # 2. Thu log dùng timeout và dùng 'stty' để đọc data thô
-                stty -F /dev/ttyACM0 115200 raw -echo
-                
-                echo "--- Đang thu thập log trong 10 giây... ---"
-                # Dùng 'timeout' nhưng thêm '|| true' để tránh báo lỗi pipeline khi timeout kết thúc
-                timeout 10s cat /dev/ttyACM0 > log.txt || true
-                
-                echo "--- KẾT QUẢ LOG TỪ CHIP ---"
-                if [ -s log.txt ]; then
-                  cat log.txt
-                else
-                  echo "Log vẫn trống! Kiểm tra lại baudrate hoặc code có in gì ra Serial không (printf/ESP_LOGI)."
-                fi
+        run: |
+            source ~/esp-idf/export.sh
+            
+            # 1. Kích hoạt chip chạy (Reset)
+            esptool.py --chip esp32c3 -p /dev/ttyACM0 run
+            sleep 1 # Đợi 1 giây để cổng serial ổn định
+            
+            # 2. Thu log dùng timeout và dùng 'stty' để đọc data thô
+            stty -F /dev/ttyACM0 115200 raw -echo
+            
+            echo "--- Đang thu thập log trong 10 giây... ---"
+            # Dùng 'timeout' nhưng thêm '|| true' để tránh báo lỗi pipeline khi timeout kết thúc
+            timeout 10s cat /dev/ttyACM0 > log.txt || true
+            
+            echo "--- KẾT QUẢ LOG TỪ CHIP ---"
+            if [ -s log.txt ]; then
+              cat log.txt
+            else
+              echo "Log vẫn trống! Kiểm tra lại baudrate hoặc code có in gì ra Serial không (printf/ESP_LOGI)."
+            fi
