@@ -8,20 +8,25 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Load ESP-IDF
         run: |
           source ~/esp-idf/export.sh
           idf.py --version
 
-      - name: Build
+      - name: Build firmware
         run: |
           source ~/esp-idf/export.sh
           idf.py set-target esp32c3
           idf.py build
-    
-      - name: flash && Monitor
+
+      - name: Flash firmware
         run: |
-          idf.py -p /dev/ttyACM0 flash 
-          idf.py monitor
+          source ~/esp-idf/export.sh
+          idf.py -p /dev/ttyACM0 flash
+
+      - name: Read serial log (10s)
+        run: |
+          timeout 10s cat /dev/ttyACM0 || true
