@@ -30,6 +30,8 @@ jobs:
       - name: Capture UART log
         run: |
           stty -F /dev/ttyACM0 115200
+          timeout 10s cat /dev/ttyACM0 > log.txt &
+          sleep 1
           esptool --chip esp32c3 -p /dev/ttyACM0 run
-          timeout 300s cat /dev/ttyACM0 > log.txt || true
+          sleep 10
           cat log.txt
