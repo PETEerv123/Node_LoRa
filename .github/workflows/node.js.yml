@@ -27,6 +27,8 @@ jobs:
           source ~/esp-idf/export.sh
           idf.py -p /dev/ttyACM0 flash
 
-      - name: Read serial log (10s)
+      - name: Capture UART log
         run: |
-          timeout 10s cat /dev/ttyACM0 || true
+          stty -F /dev/ttyACM0 115200
+          timeout 10s cat /dev/ttyACM0 > log.txt || true
+          cat log.txt
