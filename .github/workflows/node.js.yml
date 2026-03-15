@@ -1,37 +1,39 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: ESP32 Build and Flash
 
 on:
   push:
-    branches: [ main ]
+  pull_request:
 
 jobs:
   build_and_flash:
     runs-on: self-hosted
 
+    container:
+      image: espressif/idf:latest
+      options: --device=/dev/ttyUSB0
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build and Flash Firmware
+      - name: Check USB device
         run: |
-          # 1. Load môi trường (Sửa đường dẫn đúng với máy của bạn)
-          . $HOME/esp/esp-idf/export.sh
-          
-          # 2. Chọn chip
-          idf.py set-target esp32c3
-          
-          # 3. Build
-          idf.py build
-          
-          # 4. Flash (Phải đảm bảo chip đang cắm vào máy)
-          # Lưu ý: user chạy runner phải có quyền dialout
-          idf.py -p /dev/ttyUSB0 flash 
+          ls /dev/tty*
 
-      - name: Upload Artifact
+      - name: Build firmware
+        run: |
+          idf.py set-target esp32c3
+          idf.py build
+
+      - name: Flash firmware to ESP32
+        run: |
+          idf.py -p /dev/ttyUSB0 flash
+
+      - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
-          name: esp32c3-firmware
-          path: build/*.bin
+          name: esp32_firmware
+          path: |
+            build/*.bin
+            build/bootloader/*.bin
+            build/partition_table/*.bin
