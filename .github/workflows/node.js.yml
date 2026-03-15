@@ -52,7 +52,7 @@ jobs:
             
             echo "--- Đang thu thập log trong 10 giây... ---"
             # Dùng 'timeout' nhưng thêm '|| true' để tránh báo lỗi pipeline khi timeout kết thúc
-            timeout 10s cat /dev/ttyACM0 > log.txt || true
+            timeout 300s cat /dev/ttyACM0 > log.txt || true
             
             echo "--- KẾT QUẢ LOG TỪ CHIP ---"
             if [ -s log.txt ]; then
