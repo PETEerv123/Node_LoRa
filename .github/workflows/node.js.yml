@@ -20,14 +20,8 @@ jobs:
           source ~/esp/esp-idf/export.sh
           idf.py set-target esp32c3
           idf.py build
-
-      - name: Flash
+    
+      - name: flash && Monitor
         run: |
-          source ~/esp/esp-idf/export.sh
-          idf.py -p /dev/ttyACM0 flash
-
-      - name: Upload firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: build/*.bin
+          idf.py -p /dev/ttyACM* flash 
+          idf.py monitor
