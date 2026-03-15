@@ -16,6 +16,12 @@ jobs:
           source ~/esp-idf/export.sh
           idf.py --version
 
+      - name: Detect serial port
+        run: |
+          PORT=$(ls /dev/ttyACM* | head -n 1)
+          echo "PORT=$PORT"
+          echo "PORT=$PORT" >> $GITHUB_ENV
+
       - name: Build firmware
         run: |
           source ~/esp-idf/export.sh
@@ -25,13 +31,10 @@ jobs:
       - name: Flash firmware
         run: |
           source ~/esp-idf/export.sh
-          idf.py -p /dev/ttyACM0 flash
+          idf.py -p $PORT flash
 
       - name: Capture UART log
         run: |
-          stty -F /dev/ttyACM0 115200
-          timeout 10s cat /dev/ttyACM0 > log.txt &
-          sleep 1
-          esptool --chip esp32c3 -p /dev/ttyACM0 run
-          sleep 10
+          stty -F $PORT 115200
+          timeout 10s cat $PORT > log.txt || true
           cat log.txt
