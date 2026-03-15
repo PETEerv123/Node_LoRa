@@ -24,7 +24,7 @@ jobs:
       - name: Flash
         run: |
           source ~/esp/esp-idf/export.sh
-          idf.py -p /dev/ttyUSB0 flash
+          idf.py -p /dev/ttyACM0 flash
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
