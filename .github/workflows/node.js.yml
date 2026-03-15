@@ -8,13 +8,26 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Load ESP-IDF
         run: |
           source ~/esp-idf/export.sh
           idf.py --version
+
+      - name: Detect serial port
+        run: |
+          PORT=$(ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null | head -n 1)
+
+          if [ -z "$PORT" ]; then
+            echo "ESP32 serial port not found!"
+            ls /dev/tty*
+            exit 1
+          fi
+
+          echo "Detected port: $PORT"
+          echo "PORT=$PORT" >> $GITHUB_ENV
+
       - name: Build firmware
         run: |
           source ~/esp-idf/export.sh
@@ -28,6 +41,6 @@ jobs:
 
       - name: Capture UART log
         run: |
-          stty -F /dev/ttyACM0 115200
-          timeout 10s cat /dev/ttyACM0 > log.txt || true
+          stty -F $PORT 115200
+          timeout 10s cat $PORT > log.txt || true
           cat log.txt
