@@ -29,5 +29,5 @@ jobs:
       - name: Capture UART log
         run: |
           stty -F /dev/ttyACM0 115200
-          timeout 10s cat $PORT > log.txt || true
+          timeout 10s cat /dev/ttyACM0 > log.txt || true
           cat log.txt
