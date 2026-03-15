@@ -23,5 +23,5 @@ jobs:
     
       - name: flash && Monitor
         run: |
-          idf.py -p /dev/ttyACM* flash 
+          idf.py -p /dev/ttyACM0 flash 
           idf.py monitor
