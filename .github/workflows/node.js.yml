@@ -31,5 +31,5 @@ jobs:
         run: |
           stty -F /dev/ttyACM0 115200
           esptool --chip esp32c3 -p /dev/ttyACM0 run
-          timeout 10s cat /dev/ttyACM0 > log.txt || true
+          timeout 300s cat /dev/ttyACM0 > log.txt || true
           cat log.txt
