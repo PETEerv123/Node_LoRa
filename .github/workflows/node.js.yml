@@ -12,7 +12,7 @@ jobs:
 
       - name: Load ESP-IDF
         run: |
-          source ~/esp/esp-idf/export.sh
+          source ~/esp-idf/export.sh
           idf.py --version
 
       - name: Build
