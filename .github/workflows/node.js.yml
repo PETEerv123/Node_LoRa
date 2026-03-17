@@ -39,24 +39,21 @@ jobs:
           source ~/esp-idf/export.sh
           idf.py -p $PORT flash
 
-      - name: Capture UART log
+      - name: Capture UART log with Regex Exit
         run: |
-            source ~/esp-idf/export.sh
-            
-            # 1. Kích hoạt chip chạy (Reset)
-            esptool.py --chip esp32c3 -p /dev/ttyACM0 run
-            sleep 1 # Đợi 1 giây để cổng serial ổn định
-            
-            # 2. Thu log dùng timeout và dùng 'stty' để đọc data thô
-            stty -F /dev/ttyACM0 115200 raw -echo
-            
-            echo "--- Đang thu thập log trong 10 giây... ---"
-            # Dùng 'timeout' nhưng thêm '|| true' để tránh báo lỗi pipeline khi timeout kết thúc
-            timeout 300s cat /dev/ttyACM0 > log.txt || true
-            
-            echo "--- KẾT QUẢ LOG TỪ CHIP ---"
-            if [ -s log.txt ]; then
-              cat log.txt
-            else
-              echo "Log vẫn trống! Kiểm tra lại baudrate hoặc code có in gì ra Serial không (printf/ESP_LOGI)."
-            fi
+                source ~/esp-idf/export.sh
+                
+                # Sử dụng biến PORT đã detect ở trên
+                TARGET_PORT=$PORT 
+                
+                # Kích hoạt chip
+                esptool.py --chip esp32c3 -p $TARGET_PORT run
+                sleep 1
+                stty -F $TARGET_PORT 115200 raw -echo
+      
+                echo "--- Đang thu thập log cho đến khi thấy kết quả kết thúc ---"
+        
+                # Lệnh 'q' bảo sed dừng lại ngay lập tức khi khớp Regex
+                sed '/DONE_TEST_SIGNAL/q' $TARGET_PORT | tee log.txt
+
+                echo "--- CHIP ĐÃ CHẠY XONG VÀ TỰ NGẮT LOG ---"
