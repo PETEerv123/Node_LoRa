@@ -28,17 +28,12 @@ jobs:
           echo "Detected port: $PORT"
           echo "PORT=$PORT" >> $GITHUB_ENV
 
-      - name: Build firmware
+      - name: Build  && flash firmware
         run: |
           source ~/esp-idf/export.sh
           idf.py set-target esp32c3
           idf.py build
-
-      - name: Flash firmware
-        run: |
-          source ~/esp-idf/export.sh
           idf.py -p $PORT flash
-
       - name: Capture UART log with Regex Exit
         run: |
                 source ~/esp-idf/export.sh
